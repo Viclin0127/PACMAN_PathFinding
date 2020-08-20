@@ -202,6 +202,10 @@ class GraphSearchTest(testClasses.TestCase):
         searchAgents = moduleDict['searchAgents']
         gold_solution = [str.split(solutionDict['solution']), str.split(solutionDict['rev_solution'])]
         gold_expanded_states = [str.split(solutionDict['expanded_states']), str.split(solutionDict['rev_expanded_states'])]
+        if 'alt_expanded_states' in solutionDict and  'alt_rev_expanded_states' in solutionDict:
+            gold_expanded_states.append(str.split(solutionDict['alt_expanded_states']))
+            gold_expanded_states.append(str.split(solutionDict['alt_rev_expanded_states']))
+        
 
         solution, expanded_states, error = self.getSolInfo(search)
         if error != None:
@@ -224,8 +228,12 @@ class GraphSearchTest(testClasses.TestCase):
             grades.addMessage('')
             grades.addMessage('\tcorrect solution:\t\t%s' % gold_solution[0])
             grades.addMessage('\tcorrect expanded_states:\t%s' % gold_expanded_states[0])
+            if len(gold_expanded_states) > 2:
+                grades.addMessage('\tcorrect alternative expanded_states:\t%s' % gold_expanded_states[2])
             grades.addMessage('\tcorrect rev_solution:\t\t%s' % gold_solution[1])
             grades.addMessage('\tcorrect rev_expanded_states:\t%s' % gold_expanded_states[1])
+            if len(gold_expanded_states) > 2:
+                grades.addMessage('\tcorrect alternative rev_expanded_states:\t%s' % gold_expanded_states[3])
             return False
 
     def writeSolution(self, moduleDict, filePath):
@@ -894,9 +902,9 @@ class CapsuleTest(testClasses.TestCase):
         problem, _, heuristic = self.setupProblem(searchAgents)
 
         path = search.astar(problem, heuristic)
-        print(path)
+        # print(path)
         expanded = problem._expanded
-        print(expanded)
+        # print(expanded)
 
         # if not checkSolution(problem, path):
         #     grades.addMessage('FAIL: %s' % self.path)
@@ -917,7 +925,8 @@ class CapsuleTest(testClasses.TestCase):
                 points += 1.0/len(self.thresholds)
         print(points)
         grades.addPoints(points)
-        if points >= len(self.thresholds):
+        # if points >= len(self.thresholds):
+        if points >= 1:
             grades.addMessage('PASS: %s' % self.path)
         else:
             grades.addMessage('FAIL: %s' % self.path)
@@ -962,7 +971,7 @@ class CapsuleTest(testClasses.TestCase):
                 foodEdible = True
             else:
                 foodList[x][y]=False
-        print(foodList.asList())
+        # print(foodList.asList())
         if len(foodList.asList()) == 0:
             return True
         else:

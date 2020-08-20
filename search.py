@@ -142,6 +142,8 @@ def nullHeuristic(state, problem=None):
 def aStarSearch(problem, heuristic=nullHeuristic):
     """Search the node that has the lowest combined cost and heuristic first."""
     "*** YOUR CODE HERE FOR TASK 3 ***"
+
+
     util.raiseNotDefined()
 
 # Extensions Assignment 1
@@ -151,7 +153,10 @@ def iterativeDeepeningSearch(problem):
     # print("Start:", problem.getStartState())
     # print("Is the start a goal?", problem.isGoalState(problem.getStartState()))
     # print("Start's successors:", problem.getSuccessors(problem.getStartState()))
+
+    # setting limit
     limit = 0
+    # in each limit, iterating from startNode to search the goal state by DFS
     while limit<999:
         stack = util.Stack()
         visited = []
@@ -167,6 +172,8 @@ def iterativeDeepeningSearch(problem):
                 for successor, action, cost in succ:
                     if (successor not in visited):
                         nextAction = actions + [action]
+                        # child's action should be no larger than limit
+                        # ex: in limit=1, which means in the second tier(only startNode and its children)
                         if len(nextAction) <= limit:
                             stack.push([successor, nextAction])
         limit +=1
@@ -181,6 +188,33 @@ def enforcedHillClimbing(problem, heuristic=nullHeuristic):
     It will be pass to this function as second arguement (heuristic).
     """
     "*** YOUR CODE HERE FOR TASK 2 ***"
+    # design the improve function, using bfs to find h(s') < h(s) and return node, action
+    def improve(state, action):
+        queue = util.Queue()
+        node = state
+        nodeAction = action
+        visited = []
+        hvalue_init = heuristic(node, problem)
+        queue.push([node, nodeAction])
+        while not queue.isEmpty():
+            curNode, curAction = queue.pop()
+            hvalue_current = heuristic(curNode, problem)
+            # h(s') < h(s)
+            if hvalue_current < hvalue_init:
+                return curNode, curAction
+            if curNode not in visited:
+                visited.append(curNode)
+                succ = problem.getSuccessors(curNode)
+                for successor, succAction, cost in succ:
+                    if successor not in visited:
+                        nextAction = curAction + [succAction]
+                        queue.push([successor, nextAction])
+
+    startNode = problem.getStartState()
+    actions = []
+    while not problem.isGoalState(startNode):
+        startNode, actions = improve(startNode, actions)
+    return actions
     util.raiseNotDefined()
 
 # Abbreviations

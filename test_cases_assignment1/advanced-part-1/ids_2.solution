@@ -3,5 +3,7 @@
 # and left-to-right implementations.
 solution: "Right Down Right"
 expanded_states: "A A E B A E B D"
+alt_expanded_states: "A A E B A E B D H A E B D"
 rev_solution: "Right Down Right"
-rev_expanded_states: "A A B E A B H D"
+alt_rev_expanded_states: "A A B E A B H D"
+rev_expanded_states: "A A B E A B H D E A B H D"
