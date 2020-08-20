@@ -87,11 +87,43 @@ def depthFirstSearch(problem):
     print("Start's successors:", problem.getSuccessors(problem.getStartState()))
     """
     "*** YOUR CODE HERE ***"
+    stack = util.Stack()
+    visited = []
+    startNode = problem.getStartState()
+    stack.push([startNode, []])
+    while not(stack.isEmpty()):
+        curNode, actions = stack.pop()
+        if (problem.isGoalState(curNode)):
+            return actions
+        if curNode not in visited:
+            visited.append(curNode)
+            succ = problem.getSuccessors(curNode)
+            for successor, action, cost in succ:
+                if successor not in visited:
+                    nextAction = actions + [action]
+                    stack.push([successor, nextAction])
+    return []
     util.raiseNotDefined()
 
 def breadthFirstSearch(problem):
     """Search the shallowest nodes in the search tree first."""
     "*** YOUR CODE HERE ***"
+    queue = util.Queue()
+    visited = []
+    startNode = problem.getStartState()
+    queue.push([startNode, []])
+    while not queue.isEmpty():
+        curNode, actions = queue.pop()
+        if (problem.isGoalState(curNode)):
+            return actions
+        if curNode not in visited:
+            visited.append(curNode)
+            succ = problem.getSuccessors(curNode)
+            for successor, action, cost in succ:
+                if successor not in visited:
+                    nextAction = actions + [action]
+                    queue.push([successor, nextAction])
+    return []
     util.raiseNotDefined()
 
 def uniformCostSearch(problem):
@@ -116,6 +148,29 @@ def aStarSearch(problem, heuristic=nullHeuristic):
 def iterativeDeepeningSearch(problem):
     """Search the deepest node in an iterative manner."""
     "*** YOUR CODE HERE FOR TASK 1 ***"
+    # print("Start:", problem.getStartState())
+    # print("Is the start a goal?", problem.isGoalState(problem.getStartState()))
+    # print("Start's successors:", problem.getSuccessors(problem.getStartState()))
+    limit = 0
+    while limit<999:
+        stack = util.Stack()
+        visited = []
+        startNode = problem.getStartState()
+        stack.push([startNode, []])
+        while not(stack.isEmpty()):
+            curNode, actions = stack.pop()
+            if (problem.isGoalState(curNode)):
+                return actions
+            if curNode not in visited:
+                visited.append(curNode)
+                succ = problem.getSuccessors(curNode)
+                for successor, action, cost in succ:
+                    if (successor not in visited):
+                        nextAction = actions + [action]
+                        if len(nextAction) <= limit:
+                            stack.push([successor, nextAction])
+        limit +=1
+    return []
     util.raiseNotDefined()
 
 def enforcedHillClimbing(problem, heuristic=nullHeuristic):
