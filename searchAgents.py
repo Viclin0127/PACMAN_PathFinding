@@ -544,7 +544,50 @@ def mazeDistance(point1, point2, gameState):
 # Extensions Assignment 1
 class CapsuleSearchAgent(SearchAgent):
     "A SearchAgent for CapsuleSearchProblem using A* and your capsuleProblemHeuristic"
-    pass
+    def __init__(self, fn='astar', prob='CapsuleSearchProblem', heuristic='capsuleProblemHeuristic'):
+        # Warning: some advanced Python magic is employed below to find the right functions and problems
+
+        # Get the search function from the name and heuristic
+        if fn not in dir(search):
+            raise AttributeError(fn + ' is not a search function in search.py.')
+        func = getattr(search, fn)
+        if 'heuristic' not in func.__code__.co_varnames:
+            print('[SearchAgent] using function ' + fn)
+            self.searchFunction = func
+        else:
+            if heuristic in globals().keys():
+                heur = globals()[heuristic]
+            elif heuristic in dir(search):
+                heur = getattr(search, heuristic)
+            else:
+                raise AttributeError(heuristic + ' is not a function in searchAgents.py or search.py.')
+            print('[SearchAgent] using function %s and heuristic %s' % (fn, heuristic))
+            # Note: this bit of Python trickery combines the search algorithm and the heuristic
+            self.searchFunction = lambda x: func(x, heuristic=heur)
+
+        # Get the search problem type from the name
+        if prob not in globals().keys() or not prob.endswith('Problem'):
+            raise AttributeError(prob + ' is not a search problem type in SearchAgents.py.')
+        self.searchType = globals()[prob]
+        print('[SearchAgent] using problem type ' + prob)
+
+    def registerInitialState(self, state):
+        if self.searchFunction == None: raise Exception("No search function provided for SearchAgent")
+        starttime = time.time()
+        problem = self.searchType(state) # Makes a new search problem
+        self.actions  = self.searchFunction(problem) # Find a path
+        totalCost = problem.getCostOfActions(self.actions)
+        print('Path found with total cost of %d in %.1f seconds' % (totalCost, time.time() - starttime))
+        if '_expanded' in dir(problem): print('Search nodes expanded: %d' % problem._expanded)
+
+    def getAction(self, state):
+        if 'actionIndex' not in dir(self): self.actionIndex = 0
+        i = self.actionIndex
+        self.actionIndex += 1
+        if i < len(self.actions):
+            return self.actions[i]
+        else:
+            return Directions.STOP
 
 class CapsuleSearchProblem:
     """
@@ -565,19 +608,20 @@ class CapsuleSearchProblem:
         Your goal checking for the CapsuleSearchProblem goes here.
         """
         "*** YOUR CODE HERE FOR TASK 3 ***"
-
-        self.startState = ()
+        self.start = (startingGameState.getPacmanPosition(), startingGameState.getFood(), False)
+        self.startingGameState = startingGameState
+        self.capsules = startingGameState.getCapsules()[0]
         
 
     def getStartState(self):
-        return self.startState
+        return self.start
 
     def isGoalState(self, state):
         """
         Your goal checking for the CapsuleSearchProblem goes here.
         """
         "*** YOUR CODE HERE FOR TASK 3 ***"
-        return False
+        return state[1].count() == 0
 
     def getSuccessors(self, state):
 
@@ -587,8 +631,32 @@ class CapsuleSearchProblem:
         Your getSuccessors function for the CapsuleSearchProblem goes here.
         """
         "*** YOUR CODE HERE FOR TASK 3 ***"
+        getCapsule = state[2]
+        curLocation = state[0]
+        x, y = curLocation
+        if curLocation == self.capsules:
+            getCapsule = True
 
-        return successors
+        if getCapsule:
+            for action in [Directions.NORTH, Directions.SOUTH, Directions.EAST, Directions.WEST]:
+                dx, dy = Actions.directionToVector(action)
+                nextx, nexty = int(x + dx), int(y + dy)
+                if not self.walls[nextx][nexty]:
+                    nextState = (nextx, nexty)
+                    nextFood = state[1].copy()
+                    nextFood[nextx][nexty] = False
+                    successors.append(((nextState, nextFood, getCapsule), action, 1))
+            return successors
+        else:
+            for action in [Directions.NORTH, Directions.SOUTH, Directions.EAST, Directions.WEST]:
+                dx, dy = Actions.directionToVector(action)
+                nextx, nexty = int(x + dx), int(y + dy)
+                if not (self.walls[nextx][nexty] | state[1][nexty][nexty]):
+                    nextState = (nextx, nexty)
+                    nextFood = state[1].copy()
+                    nextFood[nextx][nexty] = False
+                    successors.append(((nextState, nextFood, getCapsule), action, 1))
+            return successors
 
     # should not be changed
     def getCostOfActions(self, actions):
