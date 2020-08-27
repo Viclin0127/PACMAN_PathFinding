@@ -680,5 +680,11 @@ def capsuleProblemHeuristic(state, problem):
     Your heuristic for the CapsuleSearchProblem goes here.
     """
     "*** YOUR CODE HERE FOR TASK 3 ***"
-
-    return 0
+    if not(problem.start[2]):
+        distance = float("inf")
+        for x in problem.start[1].asList():
+            if (abs(x[0] - state[0][0]) + abs(x[1] - state[0][1])) < distance:
+                distance = abs(x[0] - state[0][0]) + abs(x[1] - state[0][1])
+        return distance
+    else:
+        return 0

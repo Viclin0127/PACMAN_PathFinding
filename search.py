@@ -162,6 +162,7 @@ def aStarSearch(problem, heuristic=nullHeuristic):
                     # retrieve f value
                     f_value = cost + heuristic(successor, problem)
                     pQueue.push([successor, nextAction], f_value)
+
     return actions
     util.raiseNotDefined()
 
