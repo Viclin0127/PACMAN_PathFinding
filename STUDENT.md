@@ -4,9 +4,9 @@
 
 **Semester:** Semester 2, 2020
 
-**Student:**
+**Student:** 
 
-* Your Student number - First Name - Last Name - Student email
+* 1119147 - YuanHung - Lin - yuanhungl@student.unimelb.edu.au
 
 Replace the lines above with your correct details.
 

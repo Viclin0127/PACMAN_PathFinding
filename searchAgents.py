@@ -545,31 +545,37 @@ def mazeDistance(point1, point2, gameState):
 class CapsuleSearchAgent(SearchAgent):
     "A SearchAgent for CapsuleSearchProblem using A* and your capsuleProblemHeuristic"
     def __init__(self, fn='astar', prob='CapsuleSearchProblem', heuristic='capsuleProblemHeuristic'):
-        # Warning: some advanced Python magic is employed below to find the right functions and problems
+        # # Warning: some advanced Python magic is employed below to find the right functions and problems
+        #
+        # # Get the search function from the name and heuristic
+        # if fn not in dir(search):
+        #     raise AttributeError(fn + ' is not a search function in search.py.')
+        # func = getattr(search, fn)
+        # if 'heuristic' not in func.__code__.co_varnames:
+        #     print('[SearchAgent] using function ' + fn)
+        #     self.searchFunction = func
+        # else:
+        #     if heuristic in globals().keys():
+        #         heur = globals()[heuristic]
+        #     elif heuristic in dir(search):
+        #         heur = getattr(search, heuristic)
+        #     else:
+        #         raise AttributeError(heuristic + ' is not a function in searchAgents.py or search.py.')
+        #     print('[SearchAgent] using function %s and heuristic %s' % (fn, heuristic))
+        #     # Note: this bit of Python trickery combines the search algorithm and the heuristic
+        #     self.searchFunction = lambda x: func(x, heuristic=heur)
+        #
+        # # Get the search problem type from the name
+        # if prob not in globals().keys() or not prob.endswith('Problem'):
+        #     raise AttributeError(prob + ' is not a search problem type in SearchAgents.py.')
+        # self.searchType = globals()[prob]
+        # print('[SearchAgent] using problem type ' + prob)
 
-        # Get the search function from the name and heuristic
-        if fn not in dir(search):
-            raise AttributeError(fn + ' is not a search function in search.py.')
         func = getattr(search, fn)
-        if 'heuristic' not in func.__code__.co_varnames:
-            print('[SearchAgent] using function ' + fn)
-            self.searchFunction = func
-        else:
-            if heuristic in globals().keys():
-                heur = globals()[heuristic]
-            elif heuristic in dir(search):
-                heur = getattr(search, heuristic)
-            else:
-                raise AttributeError(heuristic + ' is not a function in searchAgents.py or search.py.')
-            print('[SearchAgent] using function %s and heuristic %s' % (fn, heuristic))
-            # Note: this bit of Python trickery combines the search algorithm and the heuristic
-            self.searchFunction = lambda x: func(x, heuristic=heur)
-
-        # Get the search problem type from the name
-        if prob not in globals().keys() or not prob.endswith('Problem'):
-            raise AttributeError(prob + ' is not a search problem type in SearchAgents.py.')
+        heur = globals()[heuristic]
+        self.searchFunction = lambda x: func(x, heuristic=heur)
         self.searchType = globals()[prob]
-        print('[SearchAgent] using problem type ' + prob)
+
 
     def registerInitialState(self, state):
         if self.searchFunction == None: raise Exception("No search function provided for SearchAgent")
@@ -680,9 +686,14 @@ def capsuleProblemHeuristic(state, problem):
     Your heuristic for the CapsuleSearchProblem goes here.
     """
     "*** YOUR CODE HERE FOR TASK 3 ***"
+    # using some kind of relaxation to get heuristic function I guess
+    # before eating Capsule, always return h value = 0
+    # otherwise, cal and return the min distance from the current point to each food node
+    # assume that there is no wall at all
     if not(problem.start[2]):
         distance = float("inf")
         for x in problem.start[1].asList():
+            # manhattan distance
             if (abs(x[0] - state[0][0]) + abs(x[1] - state[0][1])) < distance:
                 distance = abs(x[0] - state[0][0]) + abs(x[1] - state[0][1])
         return distance
